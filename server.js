@@ -1,6 +1,8 @@
 const express = require("express");//bring in express
 const path = require("path");//bring in path, which helps to direct the system to where the file lives
 const db = require("./db/db.json");
+const fs = require("fs");
+//const uuid = require('./helpers/uuid');
 
 const app = express();//setup express app
 const PORT = 3001;
@@ -25,6 +27,7 @@ app.get('*', (req, res) => res.sendFile(path.join(__dirname, 'public/index.html'
 app.post('/api/notes', (req, res) => {
   console.info(`${req.method} request recieved to add a review`);
   
+  //Recieve a new note to save on the request body
   //Destructuring assignment for the items in req.body
   const {title, text} = req.body;
 
@@ -35,18 +38,35 @@ app.post('/api/notes', (req, res) => {
       //review_id: uuid(),
     };
 
+    //Append note to db.json file
+    //Obtain existing notes
+    fs.readFile('./db/db.json', 'utf8', (err, data) => {
+      if (err) {
+        console.error(err);
+      } else {
+        //convert string into JSON object
+        const parsedNotes = JSON.parse(data);
+
+        //add new note
+        parsedNotes.push(newNote);
+
+        //Write updated notes back to file
+        fs.writeFile('./db/db.json', JSON.stringify(parsedNotes, null, 4), (writeErr) => writeErr ? console.error(writeErr) : console.info('Successfully updated notes.'));
+      }
+    });
+
     const response = {
       status: 'success',
       body: newNote,
     };
-
+    
     console.info(response);//debug
     res.status(201).json(response);
   } else {
     res.status(500).json('Error in posting review');
   }
-  //recieve a new note to save on the request body
-  //add it to the db.json file
+  
+  
   //return the new note to the client (note: need to assign a unique id when saved)
 });
 
