@@ -33,7 +33,7 @@ app.get('/api/notes', (req, res) => {
 app.get('*', (req, res) => res.sendFile(path.join(__dirname, 'public/index.html')));
 
 app.post('/api/notes', (req, res) => {
-  console.info(`${req.method} request recieved to add a review`);
+  console.info(`${req.method} request recieved to add a note`);
   
   //Recieve a new note to save on the request body
   //Destructuring assignment for the items in req.body
@@ -72,9 +72,13 @@ app.post('/api/notes', (req, res) => {
 });
 //********************* */
 app.delete('/api/notes/*', (req, res) => {
-  const {id} = req.body;
+  console.info(`${req.method} request recieved to remove a note`);
 
-  if (id) {
+  const selectedId = req.params[0];
+
+
+
+  if (selectedId) {
     fs.readFile('./db/db.json', 'utf8', (err, data) => {
       if (err) {
         console.error(err);
@@ -82,18 +86,20 @@ app.delete('/api/notes/*', (req, res) => {
         //convert string into JSON object
         const parsedNotes = JSON.parse(data);
 
+        //console.info(`current db: ${JSON.stringify(parsedNotes)}`);//debug
+
         //delete note with specified id
         const filteredNotes = parsedNotes.filter(function(note) {
-          return note.id =! id;
+          return note.id != selectedId;
         });
-        console.log(filteredNotes);
+        //console.info(`new db: ${JSON.stringify(filteredNotes)}`);//debug
 
         //Write updated notes back to file
         fs.writeFile('./db/db.json', JSON.stringify(filteredNotes, null, 4), (writeErr) => writeErr ? console.error(writeErr) : console.info('Successfully updated notes.'));
       } 
     });
 
-    console.info(`Updated object: ${JSON.stringify(filteredNotes)}`);//debug
+    //console.info(`Updated object: ${JSON.stringify(filteredNotes)}`);//debug
     res.status(201).json('Note added successfully');
   } else {
     res.status(500).json('Error in deleting note');
