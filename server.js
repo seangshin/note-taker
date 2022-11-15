@@ -67,11 +67,37 @@ app.post('/api/notes', (req, res) => {
     console.info(`Added the following object: ${JSON.stringify(newNote)}`);//debug
     res.status(201).json('Note added successfully');
   } else {
-    res.status(500).json('Error in posting review');
+    res.status(500).json('Error in posting note');
   }
-  
-  
-  //return the new note to the client (note: need to assign a unique id when saved)
 });
+//********************* */
+app.delete('/api/notes/*', (req, res) => {
+  const {id} = req.body;
 
+  if (id) {
+    fs.readFile('./db/db.json', 'utf8', (err, data) => {
+      if (err) {
+        console.error(err);
+      } else {
+        //convert string into JSON object
+        const parsedNotes = JSON.parse(data);
+
+        //delete note with specified id
+        const filteredNotes = parsedNotes.filter(function(note) {
+          return note.id =! id;
+        });
+        console.log(filteredNotes);
+
+        //Write updated notes back to file
+        fs.writeFile('./db/db.json', JSON.stringify(filteredNotes, null, 4), (writeErr) => writeErr ? console.error(writeErr) : console.info('Successfully updated notes.'));
+      } 
+    });
+
+    console.info(`Updated object: ${JSON.stringify(filteredNotes)}`);//debug
+    res.status(201).json('Note added successfully');
+  } else {
+    res.status(500).json('Error in deleting note');
+  }
+});
+//****************************** */
 app.listen(PORT, () => console.log(`App listening at http://localhost:${PORT}`));
