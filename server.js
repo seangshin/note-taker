@@ -2,7 +2,7 @@ const express = require("express");//bring in express
 const path = require("path");//bring in path, which helps to direct the system to where the file lives
 const db = require("./db/db.json");
 const fs = require("fs");
-//const uuid = require('./helpers/uuid');
+const uuid = require('./helpers/uuid');
 
 const app = express();//setup express app
 const PORT = 3001;
@@ -43,7 +43,7 @@ app.post('/api/notes', (req, res) => {
     const newNote = {
       title,
       text,
-      //review_id: uuid(),
+      id: uuid(),
     };
 
     //Append note to db.json file
