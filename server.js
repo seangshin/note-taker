@@ -5,7 +5,7 @@ const fs = require("fs");
 const uuid = require('./helpers/uuid');
 
 const app = express();//setup express app
-const PORT = 3001;
+const PORT = process.env.PORT || 3001;
 
 //app.use sets up the following built-in middleware functions in express
 app.use(express.static("public"));//used to serve static assets in a specific root directory, in this case "public"
