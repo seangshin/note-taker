@@ -17,9 +17,17 @@ app.use(express.urlencoded({ extended: true }));//used to parse incoming request
 app.get('/notes', (req, res) => res.sendFile(path.join(__dirname, '/public/notes.html')));
 
 app.get('/api/notes', (req, res) => {
-  res.json(db);
   //read the db.json file
-  //return all saved notes as JSON
+  fs.readFile('./db/db.json', 'utf8', (err, data) => {
+    if (err) {
+      console.error(err);
+    } else {
+      //convert string into JSON object
+      const parsedData = JSON.parse(data);
+      //return all saved notes as JSON
+      res.json(parsedData);
+    }
+  })
 });
 // Wildcard route to direct users to index.html
 app.get('*', (req, res) => res.sendFile(path.join(__dirname, 'public/index.html')));
@@ -55,13 +63,9 @@ app.post('/api/notes', (req, res) => {
       }
     });
 
-    const response = {
-      status: 'success',
-      body: newNote,
-    };
     
-    console.info(response);//debug
-    res.status(201).json(response);
+    console.info(`Added the following object: ${JSON.stringify(newNote)}`);//debug
+    res.status(201).json('Note added successfully');
   } else {
     res.status(500).json('Error in posting review');
   }
