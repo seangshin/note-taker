@@ -32,6 +32,7 @@ app.get('/api/notes', (req, res) => {
 // Wildcard route to direct users to index.html
 app.get('*', (req, res) => res.sendFile(path.join(__dirname, 'public/index.html')));
 
+//HTTP POST request to update notes in db
 app.post('/api/notes', (req, res) => {
   console.info(`${req.method} request recieved to add a note`);
   
@@ -70,13 +71,12 @@ app.post('/api/notes', (req, res) => {
     res.status(500).json('Error in posting note');
   }
 });
-//********************* */
+
+//HTTP DELETE request to remove notes in db
 app.delete('/api/notes/*', (req, res) => {
   console.info(`${req.method} request recieved to remove a note`);
 
   const selectedId = req.params[0];
-
-
 
   if (selectedId) {
     fs.readFile('./db/db.json', 'utf8', (err, data) => {
@@ -105,5 +105,5 @@ app.delete('/api/notes/*', (req, res) => {
     res.status(500).json('Error in deleting note');
   }
 });
-//****************************** */
+
 app.listen(PORT, () => console.log(`App listening at http://localhost:${PORT}`));
